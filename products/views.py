@@ -1,29 +1,23 @@
 from django.views.generic import ListView, DetailView
 from .models import Product, DigitalProduct
+from .mixins import TemplateTitleMixin
 
 
-class DigitalProductListView(ListView):
-    template_name = 'products/product_list.html'
+class DigitalProductListView(TemplateTitleMixin, ListView):
     model = DigitalProduct
+    title = 'Digital Downloads'
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['title'] = 'Digital Downloads'
-        print(context)
-        return context
+    def get_title(self):
+        return 'My New Title'
 
 
-class ProductListView(ListView):
+class ProductListView(TemplateTitleMixin, ListView):
+    model = Product
+    title = 'Products'
+
+
+class ProductDetailView(TemplateTitleMixin, DetailView):
     model = Product
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        print(context)
-        qs = context['object_list']
-        #context['object_list'] = Product.objects.none()
-        context['title'] = 'My Title'
-        return context
-
-
-class ProductDetailView(DetailView):
-    model = Product
+    def get_title(self):
+        return self.get_object().title
