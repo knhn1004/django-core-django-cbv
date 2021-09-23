@@ -75,7 +75,7 @@ class ProductOGDetailView(TemplateTitleMixin, DetailView):
         return self.get_object().title
 
 
-class ProductDetailView(SingleObjectMixin, View):
+class ProductMixinDetailView(SingleObjectMixin, View):
     #queryset = Product.objects.filter(pk__gte=2)
     queryset = Product.objects.all()
 
@@ -101,3 +101,20 @@ class ProductDetailView(SingleObjectMixin, View):
         model_name = self.object_list.model._meta.model_name
         template = f'{app_label}/{model_name}_detail.html'
         return render(req, template, context)
+
+
+class ProductDetailView(DetailView):
+    model = Product
+
+    # def get_object(self):
+    #    url_kwarg_id = self.kwargs.get('id')
+    #    qs = self.get_queryset().filter(id=url_kwarg_id)
+    #    if not qs.exists():
+    #        raise Http404('Product not found')
+    #    return qs.get()
+
+    # def get_context_data(self, *args, **kwargs):
+    #    context = super().get_context_data(*args, **kwargs)
+    #    print(context)
+    #    print(self.kwargs)
+    #    return context
