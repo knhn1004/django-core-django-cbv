@@ -1,11 +1,41 @@
 from django.http.response import Http404
-from django.views.generic import ListView, DetailView, View
-from django.shortcuts import render
+from django.views.generic import ListView, DetailView, View, RedirectView
+from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
 
 from .models import Product, DigitalProduct
 from .mixins import TemplateTitleMixin
+
+
+class ProductIDRedirectView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        url_params = self.kwargs
+        pk = url_params.get('pk')
+        # Product.objects.get(pk=pk) + raise Http404
+        obj = get_object_or_404(Product, pk=pk)
+        print(self.request.path, self.request.build_absolute_uri)
+        # return f"/products/{url_params.get('pk')}"
+        # obj.get_absolute_url
+        return f"/products/{obj.id}"
+
+
+class ProductRedirectView(RedirectView):
+    permanent = True  # 301
+
+    def get_redirect_url(self, *args, **kwargs):
+        url_params = self.kwargs
+        print(self.request.path, self.request.build_absolute_uri)
+        # Analytics.models.create(path=self.request.path)
+        return f"/products/{url_params.get('pk')}"
+
+
+class ProductRedirectView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        url_params = self.kwargs
+        print(self.request.path, self.request.build_absolute_uri)
+        # Analytics.models.create(path=self.request.path)
+        return f"/products/{url_params.get('pk')}"
 
 
 class DigitalProductListView(TemplateTitleMixin, ListView):
