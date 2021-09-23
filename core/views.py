@@ -1,6 +1,11 @@
 from django.views.generic import View
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
+from django.http import HttpResponseRedirect
+
+
+def about_usredirect_view(req):
+    return HttpResponseRedirect('/about/')
 
 
 def about_us_view(req):
