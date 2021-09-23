@@ -1,5 +1,7 @@
+from django.http.response import Http404
 from django.views.generic import ListView, DetailView, View
 from django.shortcuts import render
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
 
 from .models import Product, DigitalProduct
@@ -66,8 +68,36 @@ class ProductListView(MultipleObjectMixin, View):
         return render(req, template, context)
 
 
-class ProductDetailView(TemplateTitleMixin, DetailView):
+class ProductOGDetailView(TemplateTitleMixin, DetailView):
     model = Product
 
     def get_title(self):
         return self.get_object().title
+
+
+class ProductDetailView(SingleObjectMixin, View):
+    #queryset = Product.objects.filter(pk__gte=2)
+    queryset = Product.objects.all()
+
+    # def get_queryset(self):
+    #    return Product.objects.filter(user=self.request.user)
+
+    def get(self, req, *args, **kwargs):
+        print(self.kwargs)  # {'pk': 1}
+        pk = kwargs.get('pk')
+
+        self.object_list = self.get_queryset().filter(pk=pk)
+        qs = self.object_list
+
+        if not qs.exists():
+            raise Http404('this was not found')
+        self.object = qs.get()
+
+        context = self.get_context_data()
+
+        print(context)
+
+        app_label = self.object_list.model._meta.app_label
+        model_name = self.object_list.model._meta.model_name
+        template = f'{app_label}/{model_name}_detail.html'
+        return render(req, template, context)
