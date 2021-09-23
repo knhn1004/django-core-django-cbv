@@ -1,0 +1,5 @@
+{% comment %}{{ product_list }}{% endcomment %}
+
+{% for product in product_list  %}
+<li>{{ product.title }} - {{ product.slug }}</li>
+{% endfor %}
