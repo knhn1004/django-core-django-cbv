@@ -1,5 +1,5 @@
-{% comment %}{{ product_list }}{% endcomment %}
+<h1>{{ title }}</h1>
 
-{% for product in product_list  %}
+{% for product in object_list  %}
 <li>{{ product.title }} - {{ product.slug }}</li>
 {% endfor %}
