@@ -1,5 +1,11 @@
 from django.http.response import Http404
-from django.views.generic import ListView, DetailView, View, RedirectView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    View,
+    RedirectView,
+    CreateView,
+)
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
@@ -9,6 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Product, DigitalProduct
 from .mixins import TemplateTitleMixin
+from .forms import ProductModelForm
 
 
 class ProductIDRedirectView(RedirectView):
@@ -163,3 +170,19 @@ class MyProductDetailView(LoginRequiredMixin, DetailView):
     #    print(context)
     #    print(self.kwargs)
     #    return context
+
+
+class MyProductCreateView(LoginRequiredMixin, CreateView):
+    form_class = ProductModelForm
+    template_name = 'forms.html'
+    #success_url = '/products/'
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.user = self.request.user
+        obj.save()
+        # print(form.cleaned_data)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
