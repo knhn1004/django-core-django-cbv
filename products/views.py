@@ -9,6 +9,7 @@ from django.views.generic import (
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
+from django.views.generic.edit import FormMixin, ModelFormMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -116,7 +117,7 @@ class ProductOGDetailView(TemplateTitleMixin, DetailView):
 
 
 class ProductMixinDetailView(SingleObjectMixin, View):
-    #queryset = Product.objects.filter(pk__gte=2)
+    # queryset = Product.objects.filter(pk__gte=2)
     queryset = Product.objects.all()
 
     # def get_queryset(self):
@@ -172,16 +173,33 @@ class MyProductDetailView(LoginRequiredMixin, DetailView):
     #    return context
 
 
-class MyProductCreateView(LoginRequiredMixin, CreateView):
+class MyProductCreateView(LoginRequiredMixin, ModelFormMixin, View):
     form_class = ProductModelForm
     template_name = 'forms.html'
-    #success_url = '/products/'
+    # success_url = '/products/'
+
+    def get_initial(self):
+        return {
+            'title': 'Hello World! 2'
+        }
+
+    def get(self, req, *args, **kwargs):
+        form = self.get_form()
+        # form = ProductModelForm(initial={'title': 'Hello World!'})
+        return render(req, self.template_name, {'form': form})
+
+    def post(self, req, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.user = self.request.user
-        obj.save()
-        # print(form.cleaned_data)
+        form.instance.user = self.request.user
+        # obj = form.save(commit=False)
+        # obj.user = self.request.user
+        # obj.save()
         return super().form_valid(form)
 
     def form_invalid(self, form):
