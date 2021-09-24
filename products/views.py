@@ -9,7 +9,7 @@ from django.views.generic import (
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
-from django.views.generic.edit import FormMixin, ModelFormMixin
+from django.views.generic.edit import DeleteView, FormMixin, ModelFormMixin, UpdateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -178,6 +178,12 @@ class MyProductCreateView(LoginRequiredMixin, ModelFormMixin, View):
     template_name = 'forms.html'
     # success_url = '/products/'
 
+    def get_form_kwargs(self):
+        # return {
+        #    'instance': Product.objects.get(slug=self.kwargs.get('slug'))
+        # }
+        return {'instance': Product.objects.first()}
+
     def get_initial(self):
         return {
             'title': 'Hello World! 2'
@@ -204,3 +210,44 @@ class MyProductCreateView(LoginRequiredMixin, ModelFormMixin, View):
 
     def form_invalid(self, form):
         return super().form_invalid(form)
+
+
+def product_update_view(req, slug, *args, **kwargs):
+    obj = Product.objects.get(slug=slug)
+    form = ProductModelForm(req.POST or None, instance=obj)
+    if form.is_valid():
+        form.save()
+    context = {
+        'object': obj,
+        'form': form
+    }
+    return render(req, 'forms.html', context)
+
+
+class MyProductUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = ProductModelForm
+    #model = Product
+    template_name_suffix = '_update'
+
+    def get_queryset(self):
+        return Product.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        # return self.request.path
+        return self.object.get_absolute_url()
+
+    # def get_edit_url(self):
+    #    return f'/my-products/{self.id}/edit'
+
+    # def get_delete_url(self):
+    #    return f'/my-products/{self.id}/delete'
+
+
+class MyProductDeleteView(LoginRequiredMixin, DeleteView):
+    template_name = 'forms-delete.html'
+
+    def get_queryset(self):
+        return Product.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        return '/products/'

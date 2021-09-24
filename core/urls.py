@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.views.generic.base import RedirectView, TemplateView
-from products.views import (MyProductDetailView,
+from products.views import (MyProductDeleteView, MyProductDetailView, MyProductUpdateView,
                             ProductDetailView,
                             ProductListView,
                             DigitalProductListView,
@@ -18,6 +18,8 @@ urlpatterns = [
     path('products/<slug:slug>/', ProductDetailView.as_view()),
     path('my-products/create/', MyProductCreateView.as_view()),
     path('my-products/<int:pk>/', MyProductDetailView.as_view()),
+    path('my-products/<int:pk>/edit', MyProductUpdateView.as_view()),
+    path('my-products/<int:pk>/delete', MyProductDeleteView.as_view()),
     #path('products/<int:pk>/', login_required(ProductDetailView.as_view())),
     path('p/<int:pk>/', ProductDetailView.as_view()),
     path('p/<int:pk>/', ProductRedirectView.as_view()),

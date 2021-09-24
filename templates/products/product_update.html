@@ -1,0 +1,10 @@
+<h1>Update the product</h1>
+
+{{ object.title }}
+{{ object.slug }}
+
+{% if form %}
+
+{% include 'forms-update.html' with form=form %}
+
+{% endif %}
